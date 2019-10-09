@@ -28,4 +28,29 @@ defined('MOODLE_INTERNAL') || die();
 
 class cache_config extends \cache_factory {
 
+    public function create_cache(\cache_definition $definition) {
+        global $CFG;
+        // 1. Get list of stores from CFG
+        // 2. Filter list of stores through rules until 1 is selected
+        $class = $definition->get_cache_class();
+
+        //create new File cache store
+        $configuration = array(
+            'path' => '',
+            'autocreate' => false,
+            'singledirectory' => false,
+            'prescan' => false
+        );
+        $details = array(
+            'name' => $definition->get_id(),
+            'plugin' => 'file',
+            'configuration' => $configuration,
+            'class' => 'cachestore_file'
+        );
+        $store = $this::create_store_from_config($definition->get_id(), $details, $definition);
+
+        $loader = new $class($definition, $store, null);
+        $i=1;
+        return $loader;
+    }
 }
